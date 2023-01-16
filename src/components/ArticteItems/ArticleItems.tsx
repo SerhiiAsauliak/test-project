@@ -12,8 +12,6 @@ import data from '../../data.json'
 import { useHttp } from './../../hooks/useHttp';
 import { BASE_URL } from "../../config";
 import { setArticles } from "../../store/articles/slice";
-import HashTable from "../../utils/hashTable";
-import { count } from "console";
 
 export const ArticleItems = () => {
   const dispatch = useAppDispatch();
@@ -22,7 +20,8 @@ export const ArticleItems = () => {
 
   const getItems = () => {
     try {
-      dispatch(fetchArticles(searchValue))
+      filterArticles()
+      // dispatch(fetchArticles(searchValue))
     } catch (error) {
       console.log(error);
     }
@@ -30,61 +29,46 @@ export const ArticleItems = () => {
 
   useEffect(() => {
     getItems();
-    filterArticles()
+    
   }, [searchValue]);
 
   const skeleton = [...new Array(6)].map((_, index) => <SkeletonArticle key={index}/>);
-  const content = articles.map((item) => {
+  const content = articles.map((item: JSX.IntrinsicAttributes & { id: any; imageUrl: any; publishedAt: any; title: any; summary: any; }) => {
     return <SingleItem key={item.id} {...item} />;
   })
  
-  const articlesFromDB = data.map((item) => {
-    return <SingleItem key={item.id} {...item} />;
-  })
-//---------------------------------------------
-  const hashTable = new HashTable();
+  //------------------------------------------
   const mapWithMatches = new Map()
-  const mapWithCount = new Map()
-  let count = 1
   const {request} = useHttp()
 
   const filterArticles = async () => {
     const splitSearchValue = searchValue.split(' ')
     
     const fetchSearchItems = async() => {
-      const matches = [];
       for (const item of splitSearchValue) {
         let data = await request(`${BASE_URL}?search=${item}`)
-        matches.push(data);
+        
+        data.map((el: { id: any; }) => {
+          if(!mapWithMatches.has(el.id)) {
+            mapWithMatches.set(el.id, {content: el, matches: 1})
+          } else {
+            mapWithMatches.get(el.id).matches++
+          }
+          return mapWithMatches
+        })
         
       }
-      // console.log(matches.flat())
-      console.log(matches)
-      matches.flat().map(el => {
-        if(!mapWithMatches.has(el.id)) {
-          mapWithMatches.set(el.id, el)
-        }
-        if(mapWithCount.has(el.id)) {
-          count++
-          mapWithCount.set(el.id, count)
-        } else {
-          mapWithCount.set(el.id, 1)
-        }
-        return mapWithMatches 
+      const sortedMap = new Map([...mapWithMatches].sort((a, b) => b[1].matches - a[1].matches))
+      const finalArr: any[] = []
+      sortedMap.forEach(el => {
+        finalArr.push(el.content)
       })
-      console.log(mapWithMatches)
-      console.log(mapWithCount)
-      return {mapWithMatches, mapWithCount}
+      dispatch(setArticles(finalArr))           
     }
-
     const matchData = await fetchSearchItems()
-    // matchData.map(el => {
-    //   return el.map((item: { id: any; }) => mapWithMatches.set(item.id, item)
-    //   )
-    // })
   }
 
-  // nasa Starlink effects
+  //starlink satellites
   // nasa talks Mars Warming 
 
   return (
