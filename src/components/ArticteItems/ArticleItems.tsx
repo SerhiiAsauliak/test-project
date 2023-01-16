@@ -13,6 +13,7 @@ import { useHttp } from './../../hooks/useHttp';
 import { BASE_URL } from "../../config";
 import { setArticles } from "../../store/articles/slice";
 import HashTable from "../../utils/hashTable";
+import { count } from "console";
 
 export const ArticleItems = () => {
   const dispatch = useAppDispatch();
@@ -43,6 +44,8 @@ export const ArticleItems = () => {
 //---------------------------------------------
   const hashTable = new HashTable();
   const mapWithMatches = new Map()
+  const mapWithCount = new Map()
+  let count = 1
   const {request} = useHttp()
 
   const filterArticles = async () => {
@@ -56,18 +59,25 @@ export const ArticleItems = () => {
         
       }
       // console.log(matches.flat())
-      // console.log(matches)
+      console.log(matches)
       matches.flat().map(el => {
-        if(mapWithMatches.has(el.id)) {
-
+        if(!mapWithMatches.has(el.id)) {
+          mapWithMatches.set(el.id, el)
         }
-        return hashTable.setItem(el.id, el) 
+        if(mapWithCount.has(el.id)) {
+          count++
+          mapWithCount.set(el.id, count)
+        } else {
+          mapWithCount.set(el.id, 1)
+        }
+        return mapWithMatches 
       })
-      console.log(hashTable)
-      return matches
+      console.log(mapWithMatches)
+      console.log(mapWithCount)
+      return {mapWithMatches, mapWithCount}
     }
 
-    // const matchData = await fetchSearchItems()
+    const matchData = await fetchSearchItems()
     // matchData.map(el => {
     //   return el.map((item: { id: any; }) => mapWithMatches.set(item.id, item)
     //   )
