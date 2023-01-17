@@ -18,7 +18,7 @@ export const Search = () => {
       setLocalSearch(e.target.value);
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        dispatch(setSearchValue(e.target.value));
+        dispatch(setSearchValue(e.target.value.split(' ')));
       }, 500);
     };
   };

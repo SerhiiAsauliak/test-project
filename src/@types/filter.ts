@@ -1,5 +1,5 @@
 export type FilterState = {
-    searchValue: string, 
+    searchValue: string[], 
     sort: Object,
 }
 

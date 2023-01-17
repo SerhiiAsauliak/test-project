@@ -4,14 +4,11 @@ import { BASE_URL } from '../../config';
 import { useHttp } from './../../hooks/useHttp';
 
 
-export const fetchArticles = createAsyncThunk<ArticleItem[], string>(
+export const fetchArticles = createAsyncThunk(
     '@@articles/fetchAllArticles', 
-    async (param) => {
+    async () => {
         const {request} = useHttp()
         let url = BASE_URL
-        if(param) {
-            url = `${url}?search=${param}` 
-        }
         const res = await request(url)
         return res
 })

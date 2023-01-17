@@ -1,9 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 import moment from "moment";
-import { CompareComponent } from "../../utils/highlightedText";
-
+import Highlighter from "react-highlight-words";
 import folderImage from "../../assets/folder-vector.svg";
 import arrowImage from "../../assets/arrow-right.svg";
 
@@ -13,8 +11,10 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
+import { useAppSelector } from "../../store/redux-hooks";
 
 const SingleItem = ({ id, imageUrl, publishedAt, title, summary }) => {
+  
   let date = moment(publishedAt);
   date = date.format("MMM Do, YYYY");
 
@@ -26,14 +26,14 @@ const SingleItem = ({ id, imageUrl, publishedAt, title, summary }) => {
     return str;
   };
 
-  const { searchValue } = useSelector((state) => state.filter);
+  const { searchValue } = useAppSelector((state) => state.filter);
 
   return (
     <Grid item xs={12} md={4}>
       <Card
         sx={{
           maxWidth: 400,
-          height: 530,
+          height: 575,
           border: "1px solid#EAEAEA",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.05)",
           borderRadius: "5px",
@@ -82,21 +82,24 @@ const SingleItem = ({ id, imageUrl, publishedAt, title, summary }) => {
             component="h3"
             sx={{
               marginBottom: "25px",
-              maxHeight: 62,
-              overflow: "hidden",
               fontSize: 24,
             }}
           >
-            <CompareComponent value={title} higlight={searchValue} />
+            <Highlighter
+              searchWords={searchValue}
+              autoEscape={true}
+              textToHighlight={title}
+            />
           </Typography>
           <Typography
             variant="body2"
             color="text.secondary"
             sx={{ height: 95, fontSize: 16, overflow: "hidden" }}
           >
-            <CompareComponent
-              value={sliceStr(summary)}
-              higlight={searchValue}
+            <Highlighter
+              searchWords={searchValue}
+              autoEscape={true}
+              textToHighlight={sliceStr(summary)}
             />
           </Typography>
         </CardContent>
